@@ -1,0 +1,94 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 4px;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: #d0d0d0;
+  margin: 0 6px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-btn {
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: #e8e8e8;
+  border-color: #d0d0d0;
+}
+
+.toolbar-btn.active {
+  background: #e0e7ff;
+  border-color: #a0b4ff;
+  color: #3b5bdb;
+}
+
+.toolbar-btn-ai {
+  background: #f0f7ff;
+  color: #3b5bdb;
+  font-weight: 600;
+  border: 1px solid #a0b4ff;
+}
+
+.toolbar-btn-ai:hover {
+  background: #dbe4ff;
+}
+
+.toolbar-btn-export {
+  background: #f0fff4;
+  color: #2b8a3e;
+  font-weight: 600;
+  border: 1px solid #8ce99a;
+}
+
+.toolbar-btn-export:hover {
+  background: #d3f9d8;
+}
+
+.toolbar-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.toolbar-label {
+  font-size: 12px;
+}
+
+.toolbar-select {
+  padding: 4px 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+}

@@ -1,0 +1,33 @@
+MathFlow Community Edition
+Copyright 2026 MathFlow Contributors
+
+This product includes software developed by third parties:
+
+- KaTeX (MIT License) - https://katex.org/
+  Copyright (c) 2013-2020 Khan Academy and other contributors
+
+- TipTap (MIT License) - https://tiptap.dev/
+  Copyright (c) 2024 Tiptap GmbH
+
+- ProseMirror (MIT License) - https://prosemirror.net/
+  Copyright (c) 2015-2024 Marijn Haverbeke and contributors
+
+- tikzjax (MIT License) - https://tikzjax.com/
+  Copyright (c) 2019 Kiss Sz. Aron
+
+- React (MIT License) - https://react.dev/
+  Copyright (c) Meta Platforms, Inc. and affiliates
+
+- Vite (MIT License) - https://vite.dev/
+  Copyright (c) 2019-present Evan You and Vite contributors
+
+- Express (MIT License) - https://expressjs.com/
+  Copyright (c) 2009-2014 TJ Holowaychuk, 2013-2014 Roman Shtylman, 2014-2015 Douglas Christopher Wilson
+
+- jsonwebtoken (MIT License) - https://github.com/auth0/node-jsonwebtoken
+  Copyright (c) 2015 Auth0, Inc.
+
+- bcryptjs (MIT License) - https://github.com/dcodeIO/bcrypt.js
+  Copyright (c) 2012 Nevins Bartolomeo, 2012 Shane Girish
+
+For a complete list of dependencies and their licenses, see package.json and server/package.json.

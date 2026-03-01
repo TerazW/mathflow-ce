@@ -1,0 +1,403 @@
+/* Editor container */
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-surface);
+  position: relative;
+}
+
+/* Save status indicator */
+.save-indicator {
+  position: absolute;
+  top: 46px;
+  right: 16px;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.save-indicator.saving {
+  color: var(--text-secondary);
+}
+
+.save-indicator.saved {
+  color: #22c55e;
+}
+
+.editor-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* TipTap editor content */
+.mathflow-editor-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 60px;
+  min-height: 100%;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.mathflow-editor-content:focus {
+  outline: none;
+}
+
+/* Headings */
+.mathflow-editor-content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-heading);
+}
+
+.mathflow-editor-content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 28px 0 12px;
+  color: var(--text-heading);
+}
+
+.mathflow-editor-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--text-heading-sub);
+}
+
+.mathflow-editor-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: var(--text-secondary);
+}
+
+/* Paragraphs */
+.mathflow-editor-content p {
+  margin: 0 0 12px;
+}
+
+/* Lists */
+.mathflow-editor-content ul,
+.mathflow-editor-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.mathflow-editor-content li {
+  margin-bottom: 4px;
+}
+
+/* Blockquote */
+.mathflow-editor-content blockquote {
+  border-left: 4px solid var(--blockquote-border);
+  margin: 12px 0;
+  padding: 8px 16px;
+  background: var(--blockquote-bg);
+  color: var(--text-secondary);
+}
+
+/* Code */
+.mathflow-editor-content code {
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--code-color);
+}
+
+.mathflow-editor-content pre {
+  background: var(--pre-bg);
+  color: var(--pre-color);
+  padding: 16px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.mathflow-editor-content pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Horizontal rule */
+.mathflow-editor-content hr {
+  border: none;
+  border-top: 2px solid var(--border-color);
+  margin: 24px 0;
+}
+
+/* Placeholder */
+.mathflow-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--text-placeholder);
+  pointer-events: none;
+  height: 0;
+}
+
+/* Theorem environments */
+.theorem-env {
+  margin: 16px 0;
+  padding: 16px 20px;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.theorem-theorem {
+  background: #f8f9ff;
+  border-left-color: #3b5bdb;
+}
+
+.theorem-lemma {
+  background: #f8f9ff;
+  border-left-color: #5c7cfa;
+}
+
+.theorem-proposition {
+  background: #f8f9ff;
+  border-left-color: #748ffc;
+}
+
+.theorem-corollary {
+  background: #f8f9ff;
+  border-left-color: #91a7ff;
+}
+
+.theorem-definition {
+  background: #f0fff4;
+  border-left-color: #2b8a3e;
+}
+
+.theorem-proof {
+  background: #f8f9fa;
+  border-left-color: #868e96;
+}
+
+.theorem-remark {
+  background: #fff9db;
+  border-left-color: #f59f00;
+}
+
+.theorem-example {
+  background: #fff0f6;
+  border-left-color: #c2255c;
+}
+
+.theorem-env-header {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.theorem-env-header:hover {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+/* Theorem number editor popup */
+.theorem-number-popup {
+  position: fixed;
+  z-index: 10000;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+}
+
+.theorem-number-popup-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #495057);
+  margin-bottom: 8px;
+}
+
+.theorem-number-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background: var(--bg-page, #f8f9fa);
+  color: var(--text-primary, #212529);
+}
+
+.theorem-number-input:focus {
+  border-color: var(--accent-primary, #3b5bdb);
+  box-shadow: 0 0 0 2px rgba(59, 91, 219, 0.2);
+}
+
+.theorem-number-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.theorem-number-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  background: var(--bg-surface, #ffffff);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary, #495057);
+}
+
+.theorem-number-btn:hover {
+  background: var(--bg-surface-hover, #f1f3f5);
+}
+
+.theorem-env-body {
+  font-style: normal;
+}
+
+.theorem-theorem .theorem-env-body,
+.theorem-lemma .theorem-env-body,
+.theorem-proposition .theorem-env-body,
+.theorem-corollary .theorem-env-body {
+  font-style: italic;
+}
+
+.theorem-proof .theorem-env-header {
+  font-style: italic;
+}
+
+/* ===== Collaboration Presence Bar ===== */
+
+.collab-presence-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 16px;
+  background: #f1f3f5;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 12px;
+  color: #495057;
+  flex-shrink: 0;
+  min-height: 28px;
+}
+
+.collab-presence-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.collab-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.collab-status-connected {
+  background-color: #2b8a3e;
+  box-shadow: 0 0 4px rgba(43, 138, 62, 0.5);
+}
+
+.collab-status-connecting {
+  background-color: #f59f00;
+  animation: collab-pulse 1.5s ease-in-out infinite;
+}
+
+.collab-status-disconnected {
+  background-color: #e03131;
+}
+
+@keyframes collab-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.collab-status-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.collab-presence-users {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.collab-presence-user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px 1px 4px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+.collab-user-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.collab-user-name {
+  font-size: 11px;
+  color: #343a40;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collab-presence-empty {
+  color: #868e96;
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* ===== Collaboration Cursor Styles ===== */
+
+.collaboration-cursor__caret {
+  position: relative;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 2px solid;
+  border-right: none;
+  word-break: normal;
+  pointer-events: none;
+}
+
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.4em;
+  left: -1px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 2px 6px;
+  border-radius: 4px 4px 4px 0;
+  user-select: none;
+  pointer-events: none;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  font-style: normal;
+}

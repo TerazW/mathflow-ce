@@ -1,0 +1,88 @@
+import { Snippet } from './index';
+
+export const arrowSnippets: Snippet[] = [
+  {
+    trigger: '->',
+    replacement: '\\to',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    description: 'Right arrow (→)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '<-',
+    replacement: '\\leftarrow',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    description: 'Left arrow (←)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '<->',
+    replacement: '\\leftrightarrow',
+    options: { mode: 'math', triggerKind: 'auto', priority: 75, wordBoundary: false },
+    description: 'Left-right arrow (↔)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '=>',
+    replacement: '\\implies',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    description: 'Implies (⟹)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '=<',
+    replacement: '\\impliedby',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    description: 'Implied by (⟸)',
+    category: 'Arrows',
+  },
+  {
+    trigger: 'iff',
+    replacement: '\\iff',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: true },
+    description: 'If and only if (⟺)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '!>',
+    replacement: '\\mapsto',
+    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    description: 'Maps to (↦)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '>->',
+    replacement: '\\hookrightarrow',
+    options: { mode: 'math', triggerKind: 'auto', priority: 65, wordBoundary: false },
+    description: 'Hook right arrow (↪)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '->>',
+    replacement: '\\twoheadrightarrow',
+    options: { mode: 'math', triggerKind: 'auto', priority: 65, wordBoundary: false },
+    description: 'Two-headed right arrow (↠)',
+    category: 'Arrows',
+  },
+  {
+    trigger: '~>',
+    replacement: '\\rightsquigarrow',
+    options: { mode: 'math', triggerKind: 'auto', priority: 65, wordBoundary: false },
+    description: 'Squiggly right arrow',
+    category: 'Arrows',
+  },
+  {
+    trigger: 'uarr',
+    replacement: '\\uparrow',
+    options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
+    description: 'Up arrow',
+    category: 'Arrows',
+  },
+  {
+    trigger: 'darr',
+    replacement: '\\downarrow',
+    options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
+    description: 'Down arrow',
+    category: 'Arrows',
+  },
+];

@@ -1,0 +1,150 @@
+import { Snippet } from './index';
+
+export const setSnippets: Snippet[] = [
+  // Set symbols
+  {
+    trigger: 'NN',
+    replacement: '\\mathbb{N}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Natural numbers',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'ZZ',
+    replacement: '\\mathbb{Z}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Integers',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'QQ',
+    replacement: '\\mathbb{Q}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Rationals',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'RR',
+    replacement: '\\mathbb{R}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Real numbers',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'CC',
+    replacement: '\\mathbb{C}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Complex numbers',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'FF',
+    replacement: '\\mathbb{F}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Field',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'HH',
+    replacement: '\\mathbb{H}',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Quaternions / Hilbert space',
+    category: 'Sets & Logic',
+  },
+
+  // Set operations
+  {
+    trigger: 'cc',
+    replacement: '\\subset',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Subset',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'ccc',
+    replacement: '\\subseteq',
+    options: { mode: 'math', triggerKind: 'auto', priority: 65, wordBoundary: false },
+    description: 'Subset or equal',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'inn',
+    replacement: '\\in',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Element of',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'notin',
+    replacement: '\\notin',
+    options: { mode: 'math', triggerKind: 'auto', priority: 65, wordBoundary: true },
+    description: 'Not element of',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'Nn',
+    replacement: '\\cap',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Intersection',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'UU',
+    replacement: '\\cup',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Union',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'eset',
+    replacement: '\\emptyset',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: true },
+    description: 'Empty set',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'set',
+    replacement: '\\{$1\\}',
+    options: { mode: 'math', triggerKind: 'tab', priority: 55, wordBoundary: true },
+    tabStops: 1,
+    description: 'Set braces',
+    category: 'Sets & Logic',
+  },
+
+  // Quantifiers
+  {
+    trigger: 'EE',
+    replacement: '\\exists',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'Exists',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'AA',
+    replacement: '\\forall',
+    options: { mode: 'math', triggerKind: 'auto', priority: 60, wordBoundary: false },
+    description: 'For all',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'neg',
+    replacement: '\\neg',
+    options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
+    description: 'Negation',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'land',
+    replacement: '\\land',
+    options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
+    description: 'Logical and',
+    category: 'Sets & Logic',
+  },
+  {
+    trigger: 'lor',
+    replacement: '\\lor',
+    options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
+    description: 'Logical or',
+    category: 'Sets & Logic',
+  },
+];
