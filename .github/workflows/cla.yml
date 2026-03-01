@@ -26,4 +26,4 @@ jobs:
           path-to-signatures: signatures/cla.json
           path-to-document: CLA.md
           branch: main
-          allowlist: dependabot[bot],github-actions[bot]
+          allowlist: dependabot[bot],github-actions[bot],claude[bot],Claude
