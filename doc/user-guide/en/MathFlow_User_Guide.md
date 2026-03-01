@@ -2,8 +2,8 @@
 
 > MathFlow — Fast, WYSIWYG Math Notes with LaTeX Export
 
-**Version**: 1.0
-**Last Updated**: 2026-02-26
+**Version**: 0.1.0
+**Last Updated**: 2026-03-01
 
 ---
 
@@ -81,8 +81,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/TerazW/MathFlow.git
-cd MathFlow/mathflow
+git clone https://github.com/TerazW/mathflow-ce.git
+cd mathflow-ce/mathflow
 
 # Install frontend dependencies
 npm install
@@ -459,18 +459,12 @@ MathFlow supports eight theorem-like environments, each with distinct styling:
 - Click the **+ Environment** dropdown in the toolbar
 - Select the desired environment type
 
-**Method 2: Keyboard shortcuts**
-| Shortcut | Environment |
-|----------|-------------|
-| `Ctrl+Shift+T` | Theorem |
-| `Ctrl+Shift+D` | Definition |
-| `Ctrl+Shift+P` | Proof |
-
-**Method 3: Tab-expand snippets (in text mode)**
+**Method 2: Tab-expand snippets (in text mode)**
 | Trigger + Tab | Environment |
 |---------------|-------------|
 | `thm` | Theorem |
 | `lem` | Lemma |
+| `prop` | Proposition |
 | `prf` | Proof |
 | `def` | Definition |
 | `cor` | Corollary |
@@ -678,9 +672,6 @@ pdflatex notes.tex && bibtex notes && pdflatex notes.tex && pdflatex notes.tex
 | `Ctrl+U` | Underline |
 | `Ctrl+Z` | Undo |
 | `Ctrl+Shift+Z` | Redo |
-| `Ctrl+Shift+T` | Insert Theorem |
-| `Ctrl+Shift+D` | Insert Definition |
-| `Ctrl+Shift+P` | Insert Proof |
 
 ### In Math Edit Mode
 
@@ -700,6 +691,19 @@ pdflatex notes.tex && bibtex notes && pdflatex notes.tex && pdflatex notes.tex
 | `Enter` | Generate (in input) / Insert (in preview) / Retry (on error) |
 | `Escape` | Close popup |
 | `Tab` | Switch to source editing mode (in preview) |
+
+### Theorem Environments (in text mode)
+
+| Trigger + Tab | Environment |
+|---------------|-------------|
+| `thm` + Tab | Insert Theorem |
+| `def` + Tab | Insert Definition |
+| `prf` + Tab | Insert Proof |
+| `lem` + Tab | Insert Lemma |
+| `prop` + Tab | Insert Proposition |
+| `cor` + Tab | Insert Corollary |
+| `rmk` + Tab | Insert Remark |
+| `ex` + Tab | Insert Example |
 
 ### Snippet Triggers (in math mode)
 
@@ -951,10 +955,10 @@ All Greek letter snippets are **auto-expand** in **math mode** and require a wor
 ### General
 
 **Q: Where is my data stored?**
-A: Currently in your browser's localStorage. This means your data persists across sessions but is tied to your browser. Clearing browser data will delete your notes. Cloud sync is planned for a future release.
+A: Locally in your browser's localStorage and IndexedDB (for offline use). If you are logged in with an account, your notes are also synced to the server's PostgreSQL database. Clearing browser data will delete local copies, but cloud-synced data remains on the server.
 
 **Q: Can I use MathFlow offline?**
-A: The editor works offline (snippets, math rendering, text editing). AI features require internet access. Offline support with Service Worker is planned.
+A: Yes. MathFlow uses a Service Worker and IndexedDB for offline support. The editor, snippets, math rendering, and saved notes all work offline. AI features and cloud sync require internet access.
 
 **Q: What LaTeX commands does KaTeX support?**
 A: KaTeX supports most standard math LaTeX commands. See the [full list of supported functions](https://katex.org/docs/supported.html). Notable exclusions: `tikz`, `pgfplots`, `tikz-cd`. For these, use the AI assistant which will find KaTeX-compatible alternatives.
