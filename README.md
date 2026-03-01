@@ -12,7 +12,7 @@ MathFlow is an open-source, browser-based math note-taking editor designed for p
 - **Theorem environments** — theorem, lemma, proof, definition, corollary, proposition, remark, example with auto-numbering
 - **TikZ graphics** — render TikZ/tikz-cd diagrams directly in the browser via tikzjax
 - **AI assistance (BYOK)** — Ctrl+K for AI-powered LaTeX generation using your own API keys (OpenAI, Anthropic, Google)
-- **SymPy computation** — `sympy integrate(x^2, x) sympy` + Tab for symbolic math
+- **SymPy computation** — `sympy integrate(x**2, x) sympy` + Tab for symbolic math
 - **LaTeX + PDF export** — full `.tex` file export with custom preamble support
 - **4 themes** — Light, Dark, Sepia, Nord
 - **Offline support** — Service Worker + IndexedDB for offline use
