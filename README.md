@@ -41,7 +41,7 @@ MathFlow is an open-source, browser-based math note-taking editor designed for p
 | Real-time collaboration | - | - | Yes |
 | Team workspaces | - | - | Yes |
 
-The Community Edition is a **fully functional** math note-taking editor with no artificial limits. Pro/Team features are available at [mathflow.app](https://mathflow.app).
+The Community Edition is a **fully functional** math note-taking editor with no artificial limits. Pro/Team features are available at [mathflow.studio](https://mathflow.studio).
 
 ## Quick Start
 
@@ -141,7 +141,7 @@ MathFlow CE has **zero telemetry**. When self-hosted, all data stays on your ser
 
 This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
 
-For commercial licensing inquiries (embedding MathFlow in proprietary products), contact: license@mathflow.app
+For commercial licensing inquiries (embedding MathFlow in proprietary products), contact: license@mathflow.studio
 
 ## Trademark
 

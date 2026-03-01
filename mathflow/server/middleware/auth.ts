@@ -2,9 +2,17 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+const KNOWN_PLACEHOLDERS = [
+  'change-this-to-a-random-32-char-string',
+  'change-this-to-a-random-string-at-least-32-characters',
+];
+
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   console.warn('WARNING: JWT_SECRET is not set. Auth endpoints will not work. Set JWT_SECRET in your environment variables.');
+} else if (KNOWN_PLACEHOLDERS.includes(JWT_SECRET)) {
+  console.error('FATAL: JWT_SECRET is set to a known placeholder value. Please generate a real secret (e.g. openssl rand -base64 32). Auth will refuse to start.');
+  process.exit(1);
 }
 
 function getJWTSecret(): string {

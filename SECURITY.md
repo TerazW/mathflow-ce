@@ -6,7 +6,7 @@ If you discover a security vulnerability in MathFlow, please report it responsib
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, email: **security@mathflow.app** (or use GitHub's private vulnerability reporting feature)
+Instead, email: **security@mathflow.studio** (or use GitHub's private vulnerability reporting feature)
 
 Please include:
 - Description of the vulnerability
