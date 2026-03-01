@@ -1,8 +1,22 @@
 {
   "name": "mathflow",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Open-source WYSIWYG math note-taking editor with 200+ LaTeX snippets, live KaTeX rendering, and AI assistance",
   "type": "module",
+  "license": "AGPL-3.0-only",
+  "author": "MathFlow Contributors",
+  "homepage": "https://mathflow.studio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TerazW/mathflow-ce.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TerazW/mathflow-ce/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
