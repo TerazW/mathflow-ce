@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mathflow/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: mathflow
+        run: npm ci
+
+      - name: Lint
+        working-directory: mathflow
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: mathflow
+        run: npx tsc -b && npx vite build
+
+      - name: Install server dependencies
+        working-directory: mathflow/server
+        run: npm ci
+
+      - name: Build server
+        working-directory: mathflow/server
+        run: npm run build

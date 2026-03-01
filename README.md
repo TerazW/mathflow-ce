@@ -1,8 +1,9 @@
 # MathFlow — WYSIWYG Math Notes at Lecture Speed
 
-MathFlow is an open-source, browser-based math note-taking editor designed for pure mathematics PhD students and researchers. It combines the speed of Gilles Castel's Vim+UltiSnips workflow with real-time KaTeX rendering, AI assistance, and zero-configuration browser access.
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+[![CI](https://github.com/TerazW/mathflow-ce/actions/workflows/ci.yml/badge.svg)](https://github.com/TerazW/mathflow-ce/actions/workflows/ci.yml)
 
-**License:** [AGPL v3](LICENSE)
+MathFlow is an open-source, browser-based math note-taking editor designed for pure mathematics PhD students and researchers. It combines the speed of Gilles Castel's Vim+UltiSnips workflow with real-time KaTeX rendering, AI assistance, and zero-configuration browser access.
 
 ## Key Features
 
