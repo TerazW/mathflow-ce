@@ -6,9 +6,10 @@ interface ToolbarProps {
   editor: Editor;
   onExportLatex: () => void;
   onExportPdf: () => void;
+  pdfExporting?: boolean;
 }
 
-export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
+export function Toolbar({ editor, onExportLatex, onExportPdf, pdfExporting }: ToolbarProps) {
   // Force re-render when editor state changes (selection, formatting, etc.)
   const [, setUpdateCounter] = useState(0);
   useEffect(() => {
@@ -56,14 +57,18 @@ export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
                 ? '2'
                 : editor.isActive('heading', { level: 3 })
                   ? '3'
-                  : '0'
+                  : editor.isActive('codeBlock')
+                    ? 'code'
+                    : '0'
           }
           onChange={(e) => {
-            const level = parseInt(e.target.value);
-            if (level === 0) {
+            const val = e.target.value;
+            if (val === 'code') {
+              editor.chain().focus().toggleCodeBlock().run();
+            } else if (val === '0') {
               editor.chain().focus().setParagraph().run();
             } else {
-              editor.chain().focus().toggleHeading({ level: level as 1 | 2 | 3 }).run();
+              editor.chain().focus().toggleHeading({ level: parseInt(val) as 1 | 2 | 3 }).run();
             }
           }}
         >
@@ -71,6 +76,7 @@ export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
           <option value="1">Heading 1</option>
           <option value="2">Heading 2</option>
           <option value="3">Heading 3</option>
+          <option value="code">Code Block</option>
         </select>
       </div>
 
@@ -145,6 +151,42 @@ export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
           <option value="remark">Remark</option>
           <option value="example">Example</option>
         </select>
+
+        <select
+          className="toolbar-select"
+          value=""
+          title="Insert reference to a labeled environment"
+          onChange={(e) => {
+            const label = e.target.value;
+            if (label) {
+              editor.chain().focus().insertEnvRef(label).run();
+            }
+            e.target.value = '';
+          }}
+        >
+          <option value="">+ Reference</option>
+          {(() => {
+            const opts: Array<{ label: string; display: string }> = [];
+            editor.state.doc.descendants((node) => {
+              if (node.type.name === 'theoremEnv' && node.attrs.label) {
+                const typeName = (node.attrs.envType || 'theorem').replace(/^\w/, (c: string) => c.toUpperCase());
+                const num = node.attrs.customNumber ?? node.attrs.number ?? '';
+                opts.push({
+                  label: node.attrs.label,
+                  display: `${typeName}${num ? ' ' + num : ''} — ${node.attrs.label}`,
+                });
+                return false;
+              }
+              return undefined;
+            });
+            if (opts.length === 0) {
+              return <option value="" disabled>(no labeled environments)</option>;
+            }
+            return opts.map((o) => (
+              <option key={o.label} value={o.label}>{o.display}</option>
+            ));
+          })()}
+        </select>
       </div>
 
       <div className="toolbar-separator" />
@@ -153,10 +195,26 @@ export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
         <button
           className="toolbar-btn toolbar-btn-tikz"
           onClick={() => editor.chain().focus().insertTikZGraphics().run()}
-          title="Insert TikZ diagram"
+          title="Insert TikZ code block"
         >
           <span className="toolbar-icon">&#9651;</span>
           <span className="toolbar-label">TikZ</span>
+        </button>
+        <button
+          className="toolbar-btn toolbar-btn-tikz"
+          onClick={() => editor.chain().focus().insertFigure().run()}
+          title="Insert visual TikZ figure"
+        >
+          <span className="toolbar-icon">&#9633;</span>
+          <span className="toolbar-label">Figure</span>
+        </button>
+        <button
+          className="toolbar-btn"
+          onClick={() => editor.chain().focus().insertTableOfContents().run()}
+          title="Insert auto-updating Table of Contents (lists all headings, clickable)"
+        >
+          <span className="toolbar-icon">&#8801;</span>
+          <span className="toolbar-label">TOC</span>
         </button>
       </div>
 
@@ -183,8 +241,9 @@ export function Toolbar({ editor, onExportLatex, onExportPdf }: ToolbarProps) {
           className="toolbar-btn toolbar-btn-export"
           onClick={onExportPdf}
           title="Export as PDF"
+          disabled={pdfExporting}
         >
-          Export PDF
+          {pdfExporting ? 'Exporting...' : 'Export PDF'}
         </button>
       </div>
     </div>

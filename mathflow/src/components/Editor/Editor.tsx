@@ -7,13 +7,17 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { MathInline } from '../../extensions/MathInline';
 import { MathDisplay } from '../../extensions/MathDisplay';
 import { SnippetEngine } from '../../extensions/SnippetEngine';
-import { TheoremEnv } from '../../extensions/TheoremEnv';
+import { TheoremEnv, TheoremTitle } from '../../extensions/TheoremEnv';
 import { AIAssistant } from '../../extensions/AIAssistant';
 import type { AIPopupEvent } from '../../extensions/AIAssistant';
 import { TikZGraphics } from '../../extensions/TikZGraphics';
 import { SymPyComputation } from '../../extensions/SymPyComputation';
 import { downloadLaTeX } from '../../extensions/LaTeXExport';
 import { exportToPDF } from '../../extensions/PDFExport';
+import { exportToLatexPDF, LaTeXCompileError } from '../../extensions/LaTeXPDFExport';
+import { BridgeOfflineError, BridgeNoEngineError } from '../../lib/bridge';
+import { BridgeSetup } from '../BridgeSetup/BridgeSetup';
+import { PDFProgress, PDFProgressState } from '../PDFProgress/PDFProgress';
 import { updateNoteContent, getNote } from '../../lib/storage';
 import { notes as notesApi } from '../../lib/api';
 import { loadCustomPreamble } from '../../lib/ai-settings';
@@ -100,6 +104,7 @@ export function Editor({ noteId, onContentChange }: EditorProps) {
       MathDisplay as Extension,
       SnippetEngine as Extension,
       TheoremEnv as Extension,
+      TheoremTitle as Extension,
       AIAssistant as Extension,
       TikZGraphics as Extension,
       SymPyComputation as Extension,
@@ -311,14 +316,61 @@ export function Editor({ noteId, onContentChange }: EditorProps) {
   }, [editor, noteId]);
 
   const editorScrollRef = useRef<HTMLDivElement>(null);
+  const [pdfExporting, setPdfExporting] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<PDFProgressState | null>(null);
+  const [bridgeSetupOpen, setBridgeSetupOpen] = useState(false);
 
-  const handleExportPdf = useCallback(() => {
+  // Fallback: old browser-print pipeline. Triggered from PDFProgress when the
+  // bridge is offline / not installed / errors out.
+  const runFallbackPrint = useCallback(() => {
     if (!editorScrollRef.current) return;
     const editorEl = editorScrollRef.current.querySelector('.ProseMirror') as HTMLElement;
     if (!editorEl) return;
     const note = noteId ? getNote(noteId) : null;
+    setPdfProgress(null);
     exportToPDF(editorEl, note?.title || 'MathFlow Notes');
   }, [noteId]);
+
+  const handleExportPdf = useCallback(async () => {
+    if (!editor || pdfExporting) return;
+    const note = noteId ? getNote(noteId) : null;
+    const safeName = (note?.title || 'MathFlow Notes')
+      .replace(/[^a-zA-Z0-9_\-\s]/g, '').trim() || 'MathFlow Notes';
+    const customPreamble = loadCustomPreamble();
+    const json = editor.getJSON();
+
+    setPdfExporting(true);
+    setPdfProgress({ kind: 'progress', stage: 'starting', detail: 'Starting…' });
+    try {
+      await exportToLatexPDF(
+        json,
+        `${safeName}.pdf`,
+        customPreamble,
+        (stage, detail) => setPdfProgress({ kind: 'progress', stage, detail }),
+      );
+      setPdfProgress(null);
+    } catch (err: any) {
+      console.error('LaTeX PDF export failed:', err);
+      if (err instanceof BridgeOfflineError) {
+        setPdfProgress({ kind: 'bridge-offline' });
+      } else if (err instanceof BridgeNoEngineError) {
+        setPdfProgress({ kind: 'bridge-no-engine', engine: err.engine });
+      } else if (err instanceof LaTeXCompileError) {
+        setPdfProgress({
+          kind: 'error',
+          message: 'LaTeX compilation failed. See log below for details.',
+          log: err.log,
+        });
+      } else {
+        setPdfProgress({
+          kind: 'error',
+          message: err?.message || 'PDF export failed.',
+        });
+      }
+    } finally {
+      setPdfExporting(false);
+    }
+  }, [editor, noteId, pdfExporting]);
 
   if (!editor) return null;
 
@@ -348,6 +400,19 @@ export function Editor({ noteId, onContentChange }: EditorProps) {
           onClose={() => setExplainPopup(null)}
         />
       )}
+      <PDFProgress
+        state={pdfProgress}
+        onClose={() => setPdfProgress(null)}
+        onFallback={runFallbackPrint}
+        onOpenBridgeSetup={() => {
+          setPdfProgress(null);
+          setBridgeSetupOpen(true);
+        }}
+      />
+      <BridgeSetup
+        open={bridgeSetupOpen}
+        onClose={() => setBridgeSetupOpen(false)}
+      />
     </div>
   );
 }

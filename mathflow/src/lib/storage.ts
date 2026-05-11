@@ -1,9 +1,17 @@
 import { JSONContent } from '@tiptap/core';
 import { v4 as uuidv4 } from 'uuid';
 
+export interface Project {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Notebook {
   id: string;
   title: string;
+  projectId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,8 +25,62 @@ export interface Note {
   updatedAt: string;
 }
 
+const PROJECTS_KEY = 'mathflow-projects';
 const NOTEBOOKS_KEY = 'mathflow-notebooks';
 const NOTES_KEY = 'mathflow-notes';
+
+// Projects
+export function getProjects(): Project[] {
+  try {
+    const raw = localStorage.getItem(PROJECTS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveProjects(projects: Project[]): void {
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+}
+
+export function createProject(title: string): Project {
+  const project: Project = {
+    id: uuidv4(),
+    title,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  const projects = getProjects();
+  projects.push(project);
+  saveProjects(projects);
+  return project;
+}
+
+export function deleteProject(id: string): void {
+  const projects = getProjects().filter((p) => p.id !== id);
+  saveProjects(projects);
+  // Unassign notebooks that belonged to this project (don't delete them)
+  const notebooks = getNotebooks();
+  let mutated = false;
+  for (const nb of notebooks) {
+    if (nb.projectId === id) {
+      nb.projectId = null;
+      mutated = true;
+    }
+  }
+  if (mutated) saveNotebooks(notebooks);
+}
+
+export function renameProject(id: string, title: string): void {
+  const projects = getProjects();
+  const p = projects.find((x) => x.id === id);
+  if (p) {
+    p.title = title;
+    p.updatedAt = new Date().toISOString();
+    saveProjects(projects);
+  }
+}
 
 // Notebooks
 export function getNotebooks(): Notebook[] {
@@ -35,10 +97,11 @@ export function saveNotebooks(notebooks: Notebook[]): void {
   localStorage.setItem(NOTEBOOKS_KEY, JSON.stringify(notebooks));
 }
 
-export function createNotebook(title: string): Notebook {
+export function createNotebook(title: string, projectId: string | null = null): Notebook {
   const notebook: Notebook = {
     id: uuidv4(),
     title,
+    projectId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -61,6 +124,16 @@ export function renameNotebook(id: string, title: string): void {
   const nb = notebooks.find((n) => n.id === id);
   if (nb) {
     nb.title = title;
+    nb.updatedAt = new Date().toISOString();
+    saveNotebooks(notebooks);
+  }
+}
+
+export function moveNotebook(id: string, newProjectId: string | null): void {
+  const notebooks = getNotebooks();
+  const nb = notebooks.find((n) => n.id === id);
+  if (nb) {
+    nb.projectId = newProjectId;
     nb.updatedAt = new Date().toISOString();
     saveNotebooks(notebooks);
   }
@@ -133,6 +206,16 @@ export function renameNote(id: string, title: string): void {
   const note = notes.find((n) => n.id === id);
   if (note) {
     note.title = title;
+    note.updatedAt = new Date().toISOString();
+    saveNotes(notes);
+  }
+}
+
+export function moveNote(id: string, newNotebookId: string): void {
+  const notes = getNotes();
+  const note = notes.find((n) => n.id === id);
+  if (note) {
+    note.notebookId = newNotebookId;
     note.updatedAt = new Date().toISOString();
     saveNotes(notes);
   }

@@ -350,6 +350,12 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                 Continue without account (local only)
               </button>
             </div>
+
+            <div className="auth-legal">
+              By continuing, you agree to our{' '}
+              <a href="/terms">Terms of Service</a> and{' '}
+              <a href="/privacy">Privacy Policy</a>.
+            </div>
           </>
         )}
       </div>

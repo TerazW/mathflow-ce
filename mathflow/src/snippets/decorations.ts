@@ -24,10 +24,10 @@ export const decorationSnippets: Snippet[] = [
     category: 'Decorations',
   },
   {
-    trigger: /([a-zA-Z])dot$/,
+    trigger: /((?![cdlv])[a-zA-Z])dot$/,
     replacement: (match: string[]) => `\\dot{${match[1]}}`,
     options: { mode: 'math', triggerKind: 'auto', priority: 75, wordBoundary: false },
-    description: 'Dot (postfix: xdot → \\dot{x})',
+    description: 'Dot (postfix: xdot → \\dot{x}; c/d/l/v excluded to avoid cdots/ddots/ldots/vdots clash)',
     category: 'Decorations',
   },
   {

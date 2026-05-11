@@ -49,6 +49,7 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
 
   const hasCustom = node.attrs.customNumber !== null && node.attrs.customNumber !== undefined;
   const currentNum = hasCustom ? node.attrs.customNumber : (node.attrs.number || '');
+  const currentLabel = node.attrs.label || '';
 
   // Build popup
   const popup = document.createElement('div');
@@ -65,6 +66,19 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
   input.value = currentNum;
   input.placeholder = 'e.g. 18.1';
   popup.appendChild(input);
+
+  const labelTitle = document.createElement('div');
+  labelTitle.className = 'theorem-number-popup-title';
+  labelTitle.textContent = 'Label (for \\ref)';
+  labelTitle.style.marginTop = '8px';
+  popup.appendChild(labelTitle);
+
+  const labelInput = document.createElement('input');
+  labelInput.type = 'text';
+  labelInput.className = 'theorem-number-input';
+  labelInput.value = currentLabel;
+  labelInput.placeholder = 'e.g. thm:pythagoras';
+  popup.appendChild(labelInput);
 
   const btnRow = document.createElement('div');
   btnRow.className = 'theorem-number-buttons';
@@ -113,10 +127,12 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
       return;
     }
 
+    const labelVal = labelInput.value.trim();
     const { tr } = view.state;
     tr.setNodeMarkup(nodePos, undefined, {
       ...currentNode.attrs,
       customNumber,
+      label: labelVal === '' ? null : labelVal,
     });
     view.dispatch(tr);
     view.focus();
@@ -140,7 +156,7 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
     finish('');
   });
 
-  input.addEventListener('keydown', (e) => {
+  const handleEnter = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const val = input.value.trim();
@@ -150,7 +166,9 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
       e.preventDefault();
       cancel();
     }
-  });
+  };
+  input.addEventListener('keydown', handleEnter);
+  labelInput.addEventListener('keydown', handleEnter);
 
   const onClickOutside = (e: MouseEvent) => {
     if (!popup.contains(e.target as HTMLElement)) {
@@ -165,12 +183,54 @@ function showNumberEditor(view: EditorView, nodePos: number, headerEl: HTMLEleme
   }, 0);
 }
 
+/**
+ * TheoremTitle — optional inline title inside a theorem environment header.
+ * Supports plain text + marks (bold/italic/etc.) + inline math nodes.
+ * Renders as: <div.theorem-title> <span.theorem-title-prefix>Theorem 1.</span> <span.theorem-title-content>...</span> </div>
+ * The prefix is non-editable; the content is editable inline content.
+ */
+export const TheoremTitle = Node.create({
+  name: 'theoremTitle',
+
+  content: 'inline*',
+
+  selectable: false,
+
+  addAttributes() {
+    return {
+      envPrefix: {
+        default: '',
+        parseHTML: (el) => el.getAttribute('data-prefix') || '',
+        renderHTML: (attrs) => ({ 'data-prefix': attrs.envPrefix || '' }),
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      { tag: 'div[data-type="theorem-title"]' },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+    return [
+      'div',
+      mergeAttributes(HTMLAttributes, {
+        'data-type': 'theorem-title',
+        class: 'theorem-title',
+      }),
+      ['span', { class: 'theorem-title-prefix', contenteditable: 'false' }, node.attrs.envPrefix || ''],
+      ['span', { class: 'theorem-title-content' }, 0],
+    ];
+  },
+});
+
 export const TheoremEnv = Node.create<TheoremEnvOptions>({
   name: 'theoremEnv',
 
   group: 'block',
 
-  content: 'block+',
+  content: 'theoremTitle? block+',
 
   defining: true,
 
@@ -208,6 +268,14 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
           return { 'data-env-custom-number': attributes.customNumber };
         },
       },
+      label: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-env-label') || null,
+        renderHTML: (attributes) => {
+          if (!attributes.label) return {};
+          return { 'data-env-label': attributes.label, id: `env-${attributes.label}` };
+        },
+      },
     };
   },
 
@@ -223,16 +291,14 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
     const envType = node.attrs.envType || 'theorem';
     const label = THEOREM_LABELS[envType] || envType;
 
-    let headerText: string;
+    let prefixText: string;
     if (node.attrs.customNumber !== null && node.attrs.customNumber !== undefined) {
-      // Custom number override
-      headerText = node.attrs.customNumber === ''
-        ? `${label}.`
-        : `${label} ${node.attrs.customNumber}.`;
+      prefixText = node.attrs.customNumber === ''
+        ? label
+        : `${label} ${node.attrs.customNumber}`;
     } else {
-      // Auto-numbered
       const num = node.attrs.number;
-      headerText = num ? `${label} ${num}.` : `${label}.`;
+      prefixText = num ? `${label} ${num}` : label;
     }
 
     return [
@@ -240,10 +306,20 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
       mergeAttributes(HTMLAttributes, {
         'data-type': 'theorem-env',
         'data-env-type': envType,
+        'data-env-prefix': prefixText,
         class: `theorem-env theorem-${envType}`,
       }),
-      ['div', { class: 'theorem-env-header', contenteditable: 'false' }, headerText],
-      ['div', { class: 'theorem-env-body' }, 0],
+      [
+        'button',
+        {
+          class: 'theorem-env-delete',
+          contenteditable: 'false',
+          title: 'Delete this environment',
+          type: 'button',
+        },
+        '×',
+      ],
+      ['div', { class: 'theorem-env-content' }, 0],
     ];
   },
 
@@ -256,18 +332,135 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
             type: this.name,
             attrs: { envType },
             content: [
-              {
-                type: 'paragraph',
-              },
+              { type: 'theoremTitle' },
+              { type: 'paragraph' },
             ],
           });
         },
     };
   },
 
+  addKeyboardShortcuts() {
+    return {
+      // Allow deleting an empty theorem env with Backspace
+      Backspace: () => {
+        const { state, view } = this.editor;
+        const { selection } = state;
+        if (!selection.empty) return false;
+        const { $from } = selection;
+
+        // Walk up to find an enclosing theoremEnv
+        for (let d = $from.depth; d >= 0; d--) {
+          const node = $from.node(d);
+          if (node.type.name !== 'theoremEnv') continue;
+
+          // Cursor must be at the very start of its enclosing block
+          if ($from.parentOffset !== 0) return false;
+
+          // Title must be empty (or absent)
+          const first = node.firstChild;
+          const titleEmpty =
+            !first || first.type.name !== 'theoremTitle' || first.content.size === 0;
+
+          // Body must be empty (only a single empty paragraph)
+          const startIdx = first?.type.name === 'theoremTitle' ? 1 : 0;
+          let bodyEmpty = true;
+          for (let i = startIdx; i < node.childCount; i++) {
+            const child = node.child(i);
+            if (child.content.size > 0) {
+              bodyEmpty = false;
+              break;
+            }
+          }
+
+          if (!titleEmpty || !bodyEmpty) return false;
+
+          // Delete the whole env
+          const envPos = $from.before(d);
+          view.dispatch(state.tr.delete(envPos, envPos + node.nodeSize));
+          return true;
+        }
+        return false;
+      },
+    };
+  },
+
   addProseMirrorPlugins() {
+    /** Compute the prefix string (e.g. "Theorem 1.") for a theorem env. */
+    function computePrefix(envType: string, number: string | null, customNumber: string | null): string {
+      const label = THEOREM_LABELS[envType] || envType;
+      if (customNumber !== null && customNumber !== undefined) {
+        return customNumber === '' ? `${label}.` : `${label} ${customNumber}.`;
+      }
+      if (NUMBERED_TYPES.has(envType) && number) {
+        return `${label} ${number}.`;
+      }
+      return `${label}.`;
+    }
+
     return [
-      // Auto-numbering plugin (skips nodes with custom numbers)
+      // Migration: inject an empty theoremTitle into any theoremEnv that
+      // doesn't have one (legacy saved theorems). Runs whenever the doc
+      // contains envs missing titles — handles setContent() loads that
+      // happen after the editor mounts.
+      new Plugin({
+        key: new PluginKey('theoremTitleMigration'),
+        view() {
+          let pending = false;
+          return {
+            update(view) {
+              if (pending) return;
+
+              const titleType = view.state.schema.nodes.theoremTitle;
+              if (!titleType) return;
+
+              // Quick scan
+              const positions: number[] = [];
+              view.state.doc.descendants((node, pos) => {
+                if (node.type.name === 'theoremEnv') {
+                  const firstChild = node.firstChild;
+                  if (!firstChild || firstChild.type.name !== 'theoremTitle') {
+                    positions.push(pos);
+                  }
+                  return false;
+                }
+                return undefined;
+              });
+
+              if (positions.length === 0) return;
+
+              pending = true;
+              setTimeout(() => {
+                pending = false;
+
+                // Re-scan against current state (it may have changed)
+                const { state } = view;
+                const positions2: number[] = [];
+                state.doc.descendants((node, pos) => {
+                  if (node.type.name === 'theoremEnv') {
+                    const firstChild = node.firstChild;
+                    if (!firstChild || firstChild.type.name !== 'theoremTitle') {
+                      positions2.push(pos);
+                    }
+                    return false;
+                  }
+                  return undefined;
+                });
+                if (positions2.length === 0) return;
+
+                let tr = state.tr;
+                for (let i = positions2.length - 1; i >= 0; i--) {
+                  tr = tr.insert(positions2[i] + 1, titleType.create());
+                }
+                tr.setMeta('addToHistory', false);
+                view.dispatch(tr);
+              }, 0);
+            },
+          };
+        },
+      }),
+
+      // Auto-numbering plugin — keeps env.number and child theoremTitle.envPrefix in sync
       new Plugin({
         key: theoremNumberingKey,
         view() {
@@ -277,37 +470,44 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
             update(view) {
               if (pendingUpdate) return;
 
-              // Compute expected numbering from document order
+              // First pass: detect if anything needs to change
               let counter = 0;
               let needsUpdate = false;
 
               view.state.doc.descendants((node) => {
                 if (node.type.name === 'theoremEnv') {
                   const envType = node.attrs.envType || 'theorem';
-
+                  let expectedNum: string | null = null;
                   if (NUMBERED_TYPES.has(envType)) {
-                    // Skip custom-numbered nodes
-                    if (node.attrs.customNumber !== null && node.attrs.customNumber !== undefined) {
-                      return false;
-                    }
-                    counter++;
-                    if (node.attrs.number !== String(counter)) {
-                      needsUpdate = true;
+                    if (node.attrs.customNumber === null || node.attrs.customNumber === undefined) {
+                      counter++;
+                      expectedNum = String(counter);
+                      if (node.attrs.number !== expectedNum) needsUpdate = true;
                     }
                   }
-
+                  const expectedPrefix = computePrefix(
+                    envType,
+                    expectedNum ?? node.attrs.number,
+                    node.attrs.customNumber,
+                  );
+                  const firstChild = node.firstChild;
+                  if (
+                    firstChild &&
+                    firstChild.type.name === 'theoremTitle' &&
+                    firstChild.attrs.envPrefix !== expectedPrefix
+                  ) {
+                    needsUpdate = true;
+                  }
                   return false;
                 }
               });
 
               if (!needsUpdate) return;
 
-              // Schedule attribute updates via transaction (not direct DOM manipulation)
               pendingUpdate = true;
               setTimeout(() => {
                 pendingUpdate = false;
 
-                // Re-check in case state changed between scheduling and execution
                 const { state } = view;
                 let tr = state.tr;
                 let changed = false;
@@ -317,22 +517,40 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
                   if (node.type.name === 'theoremEnv') {
                     const envType = node.attrs.envType || 'theorem';
 
+                    let expectedNum: string | null = null;
                     if (NUMBERED_TYPES.has(envType)) {
-                      // Skip custom-numbered nodes
-                      if (node.attrs.customNumber !== null && node.attrs.customNumber !== undefined) {
-                        return false;
+                      if (node.attrs.customNumber === null || node.attrs.customNumber === undefined) {
+                        c++;
+                        expectedNum = String(c);
+                        if (node.attrs.number !== expectedNum) {
+                          tr = tr.setNodeMarkup(pos, undefined, {
+                            ...node.attrs,
+                            number: expectedNum,
+                          });
+                          changed = true;
+                        }
                       }
+                    }
 
-                      c++;
-                      const expectedNum = String(c);
-
-                      if (node.attrs.number !== expectedNum) {
-                        tr = tr.setNodeMarkup(pos, undefined, {
-                          ...node.attrs,
-                          number: expectedNum,
-                        });
-                        changed = true;
-                      }
+                    // Sync the child title's prefix attribute
+                    const expectedPrefix = computePrefix(
+                      envType,
+                      expectedNum ?? node.attrs.number,
+                      node.attrs.customNumber,
+                    );
+                    const firstChild = node.firstChild;
+                    if (
+                      firstChild &&
+                      firstChild.type.name === 'theoremTitle' &&
+                      firstChild.attrs.envPrefix !== expectedPrefix
+                    ) {
+                      // Title is at pos + 1 (after the env's opening token)
+                      const titlePos = pos + 1;
+                      tr = tr.setNodeMarkup(titlePos, undefined, {
+                        ...firstChild.attrs,
+                        envPrefix: expectedPrefix,
+                      });
+                      changed = true;
                     }
 
                     return false;
@@ -350,7 +568,7 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
         },
       }),
 
-      // Double-click handler for editing theorem numbers
+      // Double-click handler for editing theorem numbers + label
       new Plugin({
         key: new PluginKey('theoremNumberEditor'),
         props: {
@@ -358,20 +576,17 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
             dblclick: (view, event) => {
               const target = event.target as HTMLElement;
               if (!target.closest) return false;
-              const header = target.closest('.theorem-env-header') as HTMLElement | null;
-              if (!header) return false;
+              const prefixEl = target.closest('.theorem-title-prefix') as HTMLElement | null;
+              if (!prefixEl) return false;
 
-              const theoremEl = header.closest('.theorem-env') as HTMLElement | null;
+              const theoremEl = prefixEl.closest('.theorem-env') as HTMLElement | null;
               if (!theoremEl) return false;
 
               const envType = theoremEl.getAttribute('data-env-type') || 'theorem';
               if (!NUMBERED_TYPES.has(envType)) return false;
 
               try {
-                const bodyEl = theoremEl.querySelector('.theorem-env-body');
-                if (!bodyEl) return false;
-
-                const innerPos = view.posAtDOM(bodyEl, 0);
+                const innerPos = view.posAtDOM(theoremEl, 0);
                 const resolved = view.state.doc.resolve(innerPos);
 
                 for (let depth = resolved.depth; depth >= 0; depth--) {
@@ -379,12 +594,47 @@ export const TheoremEnv = Node.create<TheoremEnvOptions>({
                     const nodePos = resolved.before(depth);
                     event.preventDefault();
                     event.stopPropagation();
-                    showNumberEditor(view, nodePos, header);
+                    showNumberEditor(view, nodePos, prefixEl);
                     return true;
                   }
                 }
               } catch { /* ignore position errors */ }
 
+              return false;
+            },
+          },
+        },
+      }),
+
+      // Click handler for the env delete button (× in top-right corner)
+      new Plugin({
+        key: new PluginKey('theoremEnvDeleteBtn'),
+        props: {
+          handleDOMEvents: {
+            click: (view, event) => {
+              const target = event.target as HTMLElement;
+              if (!target.closest) return false;
+              const btn = target.closest('.theorem-env-delete') as HTMLElement | null;
+              if (!btn) return false;
+
+              const envEl = btn.closest('.theorem-env') as HTMLElement | null;
+              if (!envEl) return false;
+
+              try {
+                const innerPos = view.posAtDOM(envEl, 0);
+                const resolved = view.state.doc.resolve(innerPos);
+                for (let depth = resolved.depth; depth >= 0; depth--) {
+                  if (resolved.node(depth).type.name === 'theoremEnv') {
+                    const nodePos = resolved.before(depth);
+                    const node = resolved.node(depth);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    view.dispatch(view.state.tr.delete(nodePos, nodePos + node.nodeSize));
+                    view.focus();
+                    return true;
+                  }
+                }
+              } catch { /* ignore */ }
               return false;
             },
           },

@@ -1,6 +1,7 @@
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey, Selection } from '@tiptap/pm/state';
 import { allSnippets } from '../snippets';
+import { findTemplateBySnippet } from '../figure-editor/templates/registry';
 
 const snippetPluginKey = new PluginKey('snippetEngine');
 
@@ -299,6 +300,38 @@ export const SnippetEngine = Extension.create({
               const $from = state.doc.resolve(from);
               const lineStart = from - $from.parentOffset;
               const textBefore = state.doc.textBetween(lineStart, from);
+
+              // Check for figure template triggers (figxy, figfn, etc.)
+              if (!isInMathNode(state)) {
+                // "fig" alone opens the template selection panel
+                if (textBefore.match(/(?:^|[\s])fig$/)) {
+                  const deleteFrom = from - 3;
+                  const tr = state.tr.delete(deleteFrom, from);
+                  view.dispatch(tr);
+                  setTimeout(() => {
+                    document.dispatchEvent(new CustomEvent('mathflow:open-template-panel'));
+                  }, 0);
+                  event.preventDefault();
+                  return true;
+                }
+
+                const figPrefixes = ['figxy','figfn','figint','figed','figvec','figlt','figblob','figcont','figcd','figseq','figpdf','figsurf'];
+                for (const prefix of figPrefixes) {
+                  if (textBefore.endsWith(prefix)) {
+                    const tpl = findTemplateBySnippet(prefix);
+                    if (tpl) {
+                      const deleteFrom = from - prefix.length;
+                      const tr = state.tr.delete(deleteFrom, from);
+                      view.dispatch(tr);
+                      setTimeout(() => {
+                        editor.chain().focus().insertFigure(JSON.parse(JSON.stringify(tpl.figure))).run();
+                      }, 0);
+                      event.preventDefault();
+                      return true;
+                    }
+                  }
+                }
+              }
 
               const tabSnippets = allSnippets
                 .filter((s) => s.options.triggerKind === 'tab')

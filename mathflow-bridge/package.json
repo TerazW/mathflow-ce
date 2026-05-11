@@ -1,0 +1,23 @@
+{
+  "name": "mathflow-bridge",
+  "version": "1.0.0",
+  "description": "Local LaTeX compile bridge for MathFlow — compiles .tex with your local TeX Live install and returns PDF over http://127.0.0.1:5555",
+  "bin": {
+    "mathflow-bridge": "./bridge.js"
+  },
+  "main": "bridge.js",
+  "scripts": {
+    "start": "node bridge.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TerazW/mathflow-ce",
+    "directory": "mathflow-bridge"
+  },
+  "keywords": ["latex", "pdflatex", "mathflow", "compile", "bridge"],
+  "files": ["bridge.js", "README.md"]
+}

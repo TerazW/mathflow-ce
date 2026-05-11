@@ -7,6 +7,8 @@ import { Sidebar } from './components/Sidebar/Sidebar';
 import { Editor } from './components/Editor/Editor';
 import { SnippetPanel } from './components/SnippetPanel/SnippetPanel';
 import { AISettingsPanel } from './components/Settings/AISettings';
+import { BridgeStatusBadge } from './components/BridgeSetup/BridgeStatusBadge';
+import { BridgeSetup } from './components/BridgeSetup/BridgeSetup';
 import { updateNoteContent } from './lib/storage';
 import { notes as notesApi, notebooks as notebooksApi } from './lib/api';
 import { processSyncQueue, onOnlineStatusChange } from './lib/offline-storage';
@@ -20,6 +22,7 @@ function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [snippetPanelVisible, setSnippetPanelVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [bridgeSetupVisible, setBridgeSetupVisible] = useState(false);
   const [skippedAuth, setSkippedAuth] = useState(false);
   const [editorKey, setEditorKey] = useState(0);
 
@@ -82,6 +85,7 @@ function AppContent() {
             )}
           </div>
           <div className="main-header-right">
+            <BridgeStatusBadge onClick={() => setBridgeSetupVisible(true)} />
             <button
               className={`header-btn ${snippetPanelVisible ? 'active' : ''}`}
               onClick={() => setSnippetPanelVisible(!snippetPanelVisible)}
@@ -167,6 +171,10 @@ function AppContent() {
       </div>
 
       {settingsVisible && <AISettingsPanel onClose={() => setSettingsVisible(false)} />}
+      <BridgeSetup
+        open={bridgeSetupVisible}
+        onClose={() => setBridgeSetupVisible(false)}
+      />
     </div>
   );
 }

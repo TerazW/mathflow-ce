@@ -56,7 +56,7 @@ export const coreSnippets: Snippet[] = [
   {
     trigger: 'cb',
     replacement: '^3',
-    options: { mode: 'math', triggerKind: 'auto', priority: 70, wordBoundary: false },
+    options: { mode: 'math', triggerKind: 'tab', priority: 70, wordBoundary: false },
     description: 'Cubed',
     category: 'Superscripts & Subscripts',
   },
@@ -116,10 +116,38 @@ export const coreSnippets: Snippet[] = [
     category: 'Symbols',
   },
   {
+    trigger: 'cdots',
+    replacement: '\\cdots',
+    options: { mode: 'math', triggerKind: 'auto', priority: 90, wordBoundary: true },
+    description: 'Centered dots',
+    category: 'Symbols',
+  },
+  {
     trigger: 'cdot',
     replacement: '\\cdots',
     options: { mode: 'math', triggerKind: 'tab', priority: 50, wordBoundary: true },
     description: 'Centered dots',
+    category: 'Symbols',
+  },
+  {
+    trigger: 'vdots',
+    replacement: '\\vdots',
+    options: { mode: 'math', triggerKind: 'auto', priority: 90, wordBoundary: true },
+    description: 'Vertical dots',
+    category: 'Symbols',
+  },
+  {
+    trigger: 'ddots',
+    replacement: '\\ddots',
+    options: { mode: 'math', triggerKind: 'auto', priority: 90, wordBoundary: true },
+    description: 'Diagonal dots',
+    category: 'Symbols',
+  },
+  {
+    trigger: 'ldots',
+    replacement: '\\ldots',
+    options: { mode: 'math', triggerKind: 'auto', priority: 90, wordBoundary: true },
+    description: 'Lower dots',
     category: 'Symbols',
   },
 

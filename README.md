@@ -1,9 +1,8 @@
 # MathFlow — WYSIWYG Math Notes at Lecture Speed
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
-[![CI](https://github.com/TerazW/mathflow-ce/actions/workflows/ci.yml/badge.svg)](https://github.com/TerazW/mathflow-ce/actions/workflows/ci.yml)
-
 MathFlow is an open-source, browser-based math note-taking editor designed for pure mathematics PhD students and researchers. It combines the speed of Gilles Castel's Vim+UltiSnips workflow with real-time KaTeX rendering, AI assistance, and zero-configuration browser access.
+
+**License:** [AGPL v3](LICENSE)
 
 ## Key Features
 
@@ -12,8 +11,9 @@ MathFlow is an open-source, browser-based math note-taking editor designed for p
 - **Theorem environments** — theorem, lemma, proof, definition, corollary, proposition, remark, example with auto-numbering
 - **TikZ graphics** — render TikZ/tikz-cd diagrams directly in the browser via tikzjax
 - **AI assistance (BYOK)** — Ctrl+K for AI-powered LaTeX generation using your own API keys (OpenAI, Anthropic, Google)
-- **SymPy computation** — `sympy integrate(x**2, x) sympy` + Tab for symbolic math
+- **SymPy computation** — `sympy integrate(x^2, x) sympy` + Tab for symbolic math
 - **LaTeX + PDF export** — full `.tex` file export with custom preamble support
+- **Overleaf-quality PDF compile** via [MathFlow Bridge](mathflow-bridge/README.md) — a small local Node script that compiles `.tex` with your own TeX Live install. Browser-side preview falls back to print dialog when the bridge isn't running. Zero server cost.
 - **4 themes** — Light, Dark, Sepia, Nord
 - **Offline support** — Service Worker + IndexedDB for offline use
 - **Self-hosted backend** — PostgreSQL database, JWT auth, full CRUD API
@@ -26,7 +26,9 @@ MathFlow is an open-source, browser-based math note-taking editor designed for p
 | 200+ snippets (Castel-speed) | Yes | Yes | Yes |
 | Theorem environments | Yes | Yes | Yes |
 | TikZ graphics rendering | Yes | Yes | Yes |
-| LaTeX + PDF export | Yes | Yes | Yes |
+| LaTeX export (.tex) | Yes | Yes | Yes |
+| PDF export (browser print) | Yes | Yes | Yes |
+| PDF export (Overleaf-quality, local Bridge) | Yes | Yes | Yes |
 | AI assistance (BYOK) | Yes | Yes | Yes |
 | SymPy computation | Yes | Yes | Yes |
 | 4 themes | Yes | Yes | Yes |
@@ -42,7 +44,7 @@ MathFlow is an open-source, browser-based math note-taking editor designed for p
 | Real-time collaboration | - | - | Yes |
 | Team workspaces | - | - | Yes |
 
-The Community Edition is a **fully functional** math note-taking editor with no artificial limits. Pro/Team features are available at [mathflow.studio](https://mathflow.studio).
+The Community Edition is a **fully functional** math note-taking editor with no artificial limits. Pro/Team features are available at [mathflow.app](https://mathflow.app).
 
 ## Quick Start
 
@@ -97,6 +99,7 @@ AI features use BYOK (Bring Your Own Key) — configure your API key in the app'
 ## Architecture
 
 ```
+mathflow-bridge/              # Local LaTeX compile helper (Node script)
 mathflow/
 ├── src/
 │   ├── components/          # React UI components
@@ -142,7 +145,7 @@ MathFlow CE has **zero telemetry**. When self-hosted, all data stays on your ser
 
 This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
 
-For commercial licensing inquiries (embedding MathFlow in proprietary products), contact: license@mathflow.studio
+For commercial licensing inquiries (embedding MathFlow in proprietary products), contact: license@mathflow.app
 
 ## Trademark
 

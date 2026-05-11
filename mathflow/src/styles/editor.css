@@ -7,6 +7,25 @@
   position: relative;
 }
 
+/* GapCursor — shows a blinking cursor line between block nodes (math display,
+   theorem, figure) so users can click to place cursor in gaps. */
+.ProseMirror .ProseMirror-gapcursor {
+  position: relative;
+  pointer-events: none;
+}
+.ProseMirror .ProseMirror-gapcursor::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid var(--text-primary, #000);
+  animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+}
+@keyframes ProseMirror-cursor-blink {
+  to { visibility: hidden; }
+}
+
 /* Save status indicator */
 .save-indicator {
   position: absolute;
@@ -28,10 +47,47 @@
   color: #22c55e;
 }
 
+.save-indicator.saved_offline {
+  color: #f59f00;
+}
+
+.save-indicator.sync_failed {
+  color: #e03131;
+}
+
 .editor-scroll-area {
   flex: 1;
   overflow-y: auto;
   padding: 0;
+  position: relative;
+}
+
+/* Loading overlay shown while fetching note content from cloud */
+.editor-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--bg-page, #ffffff);
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+}
+
+.editor-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border-color, #e5e7eb);
+  border-top-color: var(--accent-primary, #2563eb);
+  border-radius: 50%;
+  animation: editor-spin 0.7s linear infinite;
+}
+
+@keyframes editor-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* TipTap editor content */
@@ -39,6 +95,7 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 40px 60px;
+  padding-bottom: 60vh;
   min-height: 100%;
   outline: none;
   font-size: 15px;
@@ -150,10 +207,40 @@
 
 /* Theorem environments */
 .theorem-env {
+  position: relative;
   margin: 16px 0;
   padding: 16px 20px;
   border-radius: 8px;
   border-left: 4px solid;
+}
+
+/* Hover-only × delete button at top-right of env */
+.theorem-env-delete {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #999);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+  user-select: none;
+}
+
+.theorem-env:hover .theorem-env-delete {
+  opacity: 1;
+}
+
+.theorem-env-delete:hover {
+  background: var(--accent-danger, #fa5252);
+  color: white;
 }
 
 .theorem-theorem {
@@ -196,17 +283,66 @@
   border-left-color: #c2255c;
 }
 
+/* Legacy header (used by old saved theorems without a theoremTitle child) */
 .theorem-env-header {
   font-weight: 700;
   font-size: 14px;
   margin-bottom: 8px;
-  text-transform: capitalize;
   cursor: pointer;
 }
 
 .theorem-env-header:hover {
   text-decoration: underline dotted;
   text-underline-offset: 3px;
+}
+
+/* New header: theoremTitle child node rendered as an inline-flex header bar */
+.theorem-title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.theorem-title-prefix {
+  font-weight: 700;
+  user-select: none;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.theorem-title-prefix:hover {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.theorem-title-content {
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Placeholder when title is empty (so user knows it's editable).
+   Handles both truly-empty content and browser-inserted single <br>. */
+.theorem-title-content:empty::before,
+.theorem-title-content > br:only-child::before {
+  content: '(optional title — click to type)';
+  color: var(--text-muted, #aaa);
+  font-style: italic;
+  font-weight: 400;
+  pointer-events: none;
+}
+
+.theorem-title-content:has(> br:only-child)::before {
+  content: '(optional title — click to type)';
+  color: var(--text-muted, #aaa);
+  font-style: italic;
+  font-weight: 400;
+  pointer-events: none;
+}
+
+/* Inline math nodes inside the title look correct */
+.theorem-title-content .math-inline-node {
+  font-style: normal;
 }
 
 /* Theorem number editor popup */
@@ -400,4 +536,201 @@
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
   font-style: normal;
+}
+
+/* ===== Environment Reference (\ref) ===== */
+
+.env-ref {
+  display: inline;
+  color: var(--accent-primary, #c00);
+  border: 1px solid var(--accent-primary, #c00);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin: 0 1px;
+  font-size: 0.92em;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  background: transparent;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.env-ref:hover {
+  background: var(--accent-primary, #c00);
+  color: white;
+}
+
+.env-ref.ProseMirror-selectednode {
+  outline: 2px solid var(--accent-primary, #3b5bdb);
+  outline-offset: 1px;
+}
+
+/* ===== Jump-to-environment highlight flash ===== */
+
+@keyframes env-jump-flash-anim {
+  0%   { background-color: rgba(255, 235, 59, 0.55); }
+  60%  { background-color: rgba(255, 235, 59, 0.30); }
+  100% { background-color: transparent; }
+}
+
+.env-jump-flash {
+  animation: env-jump-flash-anim 1.6s ease-out;
+  border-radius: 4px;
+}
+
+/* ===== \ref{ autocomplete popup ===== */
+
+.ref-ac-popup {
+  position: fixed;
+  z-index: 10000;
+  width: 280px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--bg-elevated, white);
+  border: 1px solid var(--border-primary, #d0d0d0);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: var(--text-primary, #222);
+}
+
+.ref-ac-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle, #f0f0f0);
+}
+
+.ref-ac-item:last-child {
+  border-bottom: none;
+}
+
+.ref-ac-item:hover,
+.ref-ac-item.active {
+  background: var(--bg-hover, #eef2ff);
+}
+
+.ref-ac-item.active {
+  border-left: 3px solid var(--accent-primary, #3b5bdb);
+  padding-left: 7px;
+}
+
+.ref-ac-item-head {
+  font-weight: 600;
+  color: var(--accent-primary, #3b5bdb);
+}
+
+.ref-ac-item-label {
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 11px;
+  color: var(--text-muted, #777);
+  margin-top: 2px;
+}
+
+.ref-ac-empty {
+  padding: 10px 12px;
+  color: var(--text-muted, #888);
+  font-style: italic;
+}
+
+/* ===== In-document Table of Contents block ===== */
+
+.toc-block {
+  border: 1px solid var(--border-primary, #d0d0d0);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: var(--bg-subtle, #fafafa);
+  font-family: 'Times New Roman', 'Times', serif;
+  user-select: none;
+}
+
+.toc-block.ProseMirror-selectednode {
+  outline: 2px solid var(--accent-primary, #3b5bdb);
+  outline-offset: 2px;
+}
+
+.toc-block-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary, #222);
+}
+
+.toc-block-empty {
+  color: var(--text-muted, #888);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.toc-block-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toc-block-item {
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 3px;
+  color: var(--accent-primary, #2222dd);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background 0.1s ease;
+}
+
+.toc-block-item:hover {
+  background: var(--bg-hover, #eef2ff);
+  text-decoration: underline;
+}
+
+.toc-block-item.toc-level-1 {
+  font-weight: 700;
+  padding-left: 6px;
+}
+
+.toc-block-item.toc-level-2 {
+  font-weight: 600;
+  padding-left: 28px;
+}
+
+.toc-block-item.toc-level-3 {
+  padding-left: 50px;
+}
+
+.toc-block-item.toc-level-4 {
+  padding-left: 72px;
+  font-size: 13px;
+}
+
+.toc-block-item.toc-level-5 {
+  padding-left: 94px;
+  font-size: 13px;
+}
+
+/* Side panel — heading items inherit indent by level */
+.toc-item.toc-heading {
+  border-left-color: transparent;
+}
+
+.toc-item.toc-h1 .toc-item-heading-text {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.toc-item.toc-h2 {
+  padding-left: 28px;
+}
+
+.toc-item.toc-h2 .toc-item-heading-text {
+  font-weight: 600;
+}
+
+.toc-item.toc-h3 {
+  padding-left: 44px;
+}
+
+.toc-item.toc-h4 {
+  padding-left: 60px;
+  font-size: 12px;
 }

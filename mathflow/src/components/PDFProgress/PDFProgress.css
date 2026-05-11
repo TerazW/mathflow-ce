@@ -1,0 +1,146 @@
+.pdf-progress-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.pdf-progress-modal {
+  background: var(--bg-elevated, white);
+  color: var(--text-primary, #222);
+  border-radius: 10px;
+  padding: 28px 32px;
+  min-width: 360px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.pdf-progress-modal h3 {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.pdf-progress-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 12px auto 18px;
+  border: 3px solid var(--border-primary, #e0e0e0);
+  border-top-color: var(--accent-primary, #3b5bdb);
+  border-radius: 50%;
+  animation: pdf-progress-spin 0.9s linear infinite;
+}
+
+@keyframes pdf-progress-spin {
+  to { transform: rotate(360deg); }
+}
+
+.pdf-progress-stage {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #222);
+  margin-bottom: 10px;
+}
+
+.pdf-progress-hint {
+  font-size: 12px;
+  color: var(--text-muted, #777);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pdf-progress-error-title {
+  color: var(--accent-danger, #e03131);
+  margin: 0 0 12px;
+}
+
+.pdf-progress-error-msg {
+  font-size: 14px;
+  color: var(--text-primary, #222);
+  margin: 0 0 14px;
+  text-align: left;
+}
+
+.pdf-progress-log {
+  margin: 0 0 14px;
+  text-align: left;
+}
+
+.pdf-progress-log summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-muted, #777);
+  user-select: none;
+  margin-bottom: 6px;
+}
+
+.pdf-progress-log pre {
+  max-height: 240px;
+  overflow: auto;
+  background: var(--bg-subtle, #f5f5f5);
+  border: 1px solid var(--border-primary, #e0e0e0);
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-family: 'Menlo', 'Monaco', monospace;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pdf-progress-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.pdf-progress-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  border: 1px solid var(--border-primary, #d0d0d0);
+  background: var(--bg-elevated, white);
+  color: var(--text-primary, #222);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.pdf-progress-btn:hover {
+  background: var(--bg-hover, #f0f4ff);
+}
+
+.pdf-progress-btn-primary {
+  background: var(--accent-primary, #3b5bdb);
+  border-color: var(--accent-primary, #3b5bdb);
+  color: white;
+}
+
+.pdf-progress-btn-primary:hover {
+  background: var(--accent-primary-hover, #2845c9);
+}
+
+.pdf-progress-bullets {
+  text-align: left;
+  font-size: 13.5px;
+  color: var(--text-secondary, #555);
+  line-height: 1.55;
+  margin: 0 0 16px 18px;
+  padding: 0;
+}
+.pdf-progress-bullets li {
+  margin-bottom: 4px;
+}
+.pdf-progress-error-msg code {
+  background: var(--bg-subtle, #f0f0f0);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-family: 'Menlo', 'Monaco', monospace;
+}

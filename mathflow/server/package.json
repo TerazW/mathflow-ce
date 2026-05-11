@@ -1,7 +1,7 @@
 {
-  "name": "@mathflow/server",
-  "version": "0.1.0",
-  "description": "MathFlow CE backend server — Express + PostgreSQL",
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch index.ts",
@@ -9,8 +9,8 @@
     "start": "node start.js"
   },
   "keywords": [],
-  "author": "MathFlow Contributors",
-  "license": "AGPL-3.0-only",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "bcryptjs": "^3.0.3",

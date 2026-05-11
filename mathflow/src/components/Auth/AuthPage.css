@@ -204,6 +204,23 @@
   color: #495057;
 }
 
+.auth-legal {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #868e96;
+  line-height: 1.5;
+}
+
+.auth-legal a {
+  color: #495057;
+  text-decoration: underline;
+}
+
+.auth-legal a:hover {
+  color: #212529;
+}
+
 /* Success message */
 .auth-success {
   background: #ebfbee;

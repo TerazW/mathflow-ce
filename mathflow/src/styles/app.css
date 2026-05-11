@@ -276,6 +276,19 @@ html, body, #root {
   color: var(--text-secondary);
 }
 
+.header-btn-save {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.header-btn-save:hover {
+  opacity: 0.9;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
 /* Main content area */
 .main-content {
   flex: 1;

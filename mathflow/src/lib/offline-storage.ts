@@ -101,7 +101,12 @@ export async function clearPendingSyncOps(): Promise<void> {
 }
 
 export async function removeSyncOp(id: number): Promise<void> {
-  await idbDelete(STORES.pendingSync, String(id));
+  const store = await getStore(STORES.pendingSync, 'readwrite');
+  return new Promise((resolve, reject) => {
+    const request = store.delete(id); // autoIncrement key is numeric
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
@@ -126,6 +131,7 @@ export async function processSyncQueue(
   ops.sort((a, b) => a.timestamp - b.timestamp);
 
   let processed = 0;
+  const successIds: number[] = [];
 
   for (const op of ops) {
     try {
@@ -155,15 +161,16 @@ export async function processSyncQueue(
         }
       }
       processed++;
+      if (op.id != null) successIds.push(op.id);
     } catch (err) {
       console.warn(`Sync operation failed (${op.type} ${op.entity} ${op.entityId}):`, err);
-      // Continue with other operations rather than failing entirely
+      // Keep failed ops in the queue for retry — only remove successful ones
     }
   }
 
-  // Clear all processed ops
-  if (processed > 0) {
-    await clearPendingSyncOps();
+  // Only remove successfully processed ops (not blanket clear)
+  for (const id of successIds) {
+    await removeSyncOp(id).catch(() => {});
   }
 
   return processed;

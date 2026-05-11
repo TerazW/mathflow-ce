@@ -1,11 +1,16 @@
 import { Node, mergeAttributes, NodeViewRendererProps } from '@tiptap/core';
-import { Selection } from '@tiptap/pm/state';
+import { Selection, TextSelection, Plugin, PluginKey } from '@tiptap/pm/state';
 import katex from 'katex';
 import {
   processAutoSnippetContentEditable,
   processTabSnippetContentEditable,
 } from './mathSnippets';
 import { processSymPyContentEditable } from './SymPyComputation';
+import {
+  attachRefAutocomplete,
+  makeContentEditableAdapter,
+  resolveRefs,
+} from './RefAutocomplete';
 
 export interface MathInlineOptions {
   HTMLAttributes: Record<string, any>;
@@ -122,7 +127,8 @@ export const MathInline = Node.create<MathInlineOptions>({
           return;
         }
         try {
-          render.innerHTML = katex.renderToString(tex, {
+          const resolved = resolveRefs(tex, props.editor);
+          render.innerHTML = katex.renderToString(resolved, {
             throwOnError: false,
             displayMode: false,
           });
@@ -135,6 +141,8 @@ export const MathInline = Node.create<MathInlineOptions>({
         }
       }
 
+      let detachAutocomplete: (() => void) | null = null;
+
       function startEditing() {
         if (isEditing) return;
         isEditing = true;
@@ -143,6 +151,13 @@ export const MathInline = Node.create<MathInlineOptions>({
         render.style.display = 'none';
         editor.textContent = currentLatex;
         editor.focus();
+
+        // Attach \ref{ autocomplete
+        const adapter = makeContentEditableAdapter(editor, () => {
+          const tex = editor.textContent || '';
+          renderKatex(tex);
+        });
+        detachAutocomplete = attachRefAutocomplete(adapter, editor, props.editor);
 
         const range = document.createRange();
         const sel = window.getSelection();
@@ -165,6 +180,11 @@ export const MathInline = Node.create<MathInlineOptions>({
         editor.style.display = 'none';
         render.style.display = 'inline';
         render.style.opacity = '1';
+
+        if (detachAutocomplete) {
+          detachAutocomplete();
+          detachAutocomplete = null;
+        }
 
         const newLatex = editor.textContent || '';
         currentLatex = newLatex;
@@ -189,11 +209,12 @@ export const MathInline = Node.create<MathInlineOptions>({
         setTimeout(() => startEditing(), 20);
       }
 
-      dom.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        startEditing();
-      });
+      // Use ProseMirror's selectNode/deselectNode instead of click handlers.
+      // This lets ProseMirror handle all click positioning natively:
+      // - Click ON the math node → NodeSelection → selectNode → enter editing
+      // - Click AFTER the math node → TextSelection → cursor placed correctly
+      // Previously, a click handler with stopPropagation prevented cursor
+      // placement after the last inline math in a paragraph.
 
       editor.addEventListener('blur', () => {
         stopEditing();
@@ -264,12 +285,23 @@ export const MathInline = Node.create<MathInlineOptions>({
 
       return {
         dom,
-        stopEvent: (event: Event) => {
+        stopEvent: () => {
+          // Only intercept events when actively editing the math content.
+          // Otherwise, let ProseMirror handle clicks for cursor positioning.
           if (isEditing) return true;
-          if (event.type === 'mousedown' || event.type === 'click') return true;
           return false;
         },
         ignoreMutation: () => true,
+        selectNode: () => {
+          // ProseMirror selected this atom node (user clicked on it)
+          dom.classList.add('ProseMirror-selectednode');
+          startEditing();
+        },
+        deselectNode: () => {
+          // ProseMirror deselected this node (user clicked elsewhere)
+          dom.classList.remove('ProseMirror-selectednode');
+          if (isEditing) stopEditing();
+        },
         update: (updatedNode) => {
           if (updatedNode.type !== props.node.type) return false;
           currentLatex = updatedNode.attrs.latex || '';
@@ -281,6 +313,46 @@ export const MathInline = Node.create<MathInlineOptions>({
         destroy: () => {},
       };
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey('mathInlineClick'),
+        props: {
+          // When clicking on an inline math atom node, check if the click is
+          // on the right half. If so, place a TextSelection after the node
+          // instead of a NodeSelection on it. This lets users place the cursor
+          // after an inline math node at the end of a paragraph.
+          handleClickOn(view, _pos, node, nodePos, event, direct) {
+            if (!direct) return false;
+            if (node.type.name !== 'mathInline') return false;
+
+            // Find the DOM element for this node
+            const domNode = view.nodeDOM(nodePos);
+            if (!domNode || !(domNode instanceof HTMLElement)) return false;
+
+            const rect = domNode.getBoundingClientRect();
+            const clickX = event.clientX;
+
+            // If click is on the right third of the node, place cursor after it
+            if (clickX > rect.left + rect.width * 0.67) {
+              const afterPos = nodePos + node.nodeSize;
+              const $after = view.state.doc.resolve(afterPos);
+              // Only do this if there's a valid text position after the node
+              if ($after.parent.inlineContent) {
+                const tr = view.state.tr.setSelection(TextSelection.create(view.state.doc, afterPos));
+                view.dispatch(tr);
+                view.focus();
+                return true;
+              }
+            }
+
+            return false;
+          },
+        },
+      }),
+    ];
   },
 
   addInputRules() {

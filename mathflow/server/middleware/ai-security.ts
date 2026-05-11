@@ -1,28 +1,25 @@
-// SPDX-License-Identifier: AGPL-3.0-only
-import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
+import { Request, Response, NextFunction } from 'express';
 
 export const aiRateLimit = rateLimit({
   windowMs: 60 * 1000,
-  max: 20,
-  message: { error: 'Too many AI requests, please try again later' },
+  max: 30,
+  message: { error: 'Too many requests' },
+  validate: { trustProxy: false },
 });
 
 export function validateAIRequest(req: Request, res: Response, next: NextFunction) {
-  const { prompt, provider, apiKey } = req.body;
+  const { apiKey } = req.body;
+  // The text field can be named prompt, expression, or description depending on the endpoint
+  const textInput = req.body.prompt ?? req.body.expression ?? req.body.description;
 
-  if (!prompt || typeof prompt !== 'string') {
-    res.status(400).json({ error: 'A valid prompt is required' });
+  if (typeof textInput !== 'string' || textInput.length > 5000) {
+    res.status(400).json({ error: 'Input too long (maximum 5000 characters)' });
     return;
   }
 
-  if (!provider || typeof provider !== 'string') {
-    res.status(400).json({ error: 'A valid provider is required' });
-    return;
-  }
-
-  if (!apiKey || typeof apiKey !== 'string') {
-    res.status(400).json({ error: 'A valid API key is required' });
+  if (typeof apiKey !== 'string' || apiKey.length > 200) {
+    res.status(400).json({ error: 'API Key format is incorrect' });
     return;
   }
 
