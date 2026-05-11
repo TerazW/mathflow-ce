@@ -9,13 +9,13 @@ When you self-host MathFlow:
 - **No tracking** — no cookies for analytics, no third-party scripts, no data collection whatsoever
 - **You control everything** — your database, your backups, your infrastructure
 
-## Hosted Version (mathflow.app)
+## Hosted Version (mathflow.studio)
 
-If you use the managed hosted version at mathflow.app:
+If you use the managed hosted version at mathflow.studio:
 
 - Notes stored in encrypted PostgreSQL
 - AI requests proxied through our server (we do not log prompts or responses)
-- See full privacy policy at mathflow.app/privacy
+- See full privacy policy at mathflow.studio/privacy
 
 ## Data Sovereignty
 

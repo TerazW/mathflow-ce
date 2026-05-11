@@ -83,7 +83,7 @@ You now have a blank editor ready.
 
 #### 2a. Create a Definition block
 
-**Do this**: Press `Ctrl+Shift+D`
+**Do this**: Type `def` then press **Tab**
 
 **Result**: A green-bordered "Definition" block appears. Your cursor is inside it.
 
@@ -196,7 +196,7 @@ Type: `every ` then `mk` → type `sigma` → **Enter** → type `-ring is also 
 
 #### 3a. New Definition block
 
-Press `Ctrl+Shift+D` again.
+Type `def` then press **Tab** again.
 
 #### 3b. Opening text
 

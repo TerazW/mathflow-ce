@@ -2,7 +2,7 @@
 
 > The definitive reference for all MathFlow features, snippets, and mathematical symbols.
 
-**Version**: 1.0 | **Last Updated**: 2026-02-26
+**Version**: 0.1.0 | **Last Updated**: 2026-03-01
 
 ---
 
@@ -90,7 +90,7 @@ cd mathflow/server && npm install && npm run dev  # Backend → http://localhost
 
 ### Snippet Panel (Right)
 - Click **Snippets** in the header bar to toggle
-- Searchable reference of all 190+ snippets
+- Searchable reference of all 200+ snippets
 - Shows trigger, result, and type (auto/tab)
 
 ---
@@ -813,13 +813,18 @@ f(x) = \begin{cases}
 
 ## 19. Theorem Environments
 
-### Keyboard Shortcuts (Text mode)
+### Tab-Expand Snippets (Text mode)
 
-| Shortcut | Environment | Style |
-|----------|------------|-------|
-| Ctrl+Shift+T | Theorem | Blue, italic body |
-| Ctrl+Shift+D | Definition | Green |
-| Ctrl+Shift+P | Proof | Gray |
+| Trigger + Tab | Environment | Style |
+|---------------|------------|-------|
+| `thm` | Theorem | Blue, italic body |
+| `lem` | Lemma | Blue, italic body |
+| `prop` | Proposition | Blue, italic body |
+| `def` | Definition | Green |
+| `cor` | Corollary | Blue, italic body |
+| `prf` | Proof | Gray |
+| `rmk` | Remark | Yellow |
+| `ex` | Example | Yellow |
 
 ### Toolbar: + Environment Dropdown
 
@@ -1042,9 +1047,6 @@ Compile with `pdflatex` or upload to Overleaf.
 | Ctrl+I | Italic |
 | Ctrl+U | Underline |
 | Ctrl+K | Open AI assistant |
-| Ctrl+Shift+T | Insert Theorem |
-| Ctrl+Shift+D | Insert Definition |
-| Ctrl+Shift+P | Insert Proof |
 
 ### In Inline Math (Yellow Box)
 
