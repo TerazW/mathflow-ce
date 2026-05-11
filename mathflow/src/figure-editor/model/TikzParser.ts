@@ -568,7 +568,7 @@ function parseTikzCdSource(source: string): TikzFigure {
     nodeGrid.push([]);
     for (let col = 0; col < cells.length; col++) {
       // Extract the node label (text before any \arrow)
-      let cellContent = cells[col];
+      const cellContent = cells[col];
       // Remove \arrow[...]{...} commands to get the label
       let label = cellContent.replace(/\\arrow\[[^\]]*\](?:\{[^}]*\})?/g, '').trim();
       if (!label) label = '';
@@ -678,7 +678,7 @@ export function parseTikzSource(source: string): TikzFigure {
 
   // Detect viewport from axis draw commands
   let hasAxes = false;
-  let hasGrid = false;
+  const hasGrid = false;
 
   // Try to find \begin{tikzpicture}
   const tpIdx = source.indexOf('\\begin{tikzpicture}');
