@@ -1,61 +1,52 @@
-// SPDX-License-Identifier: AGPL-3.0-only
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const EMAIL_FROM = process.env.EMAIL_FROM || 'MathFlow <noreply@mathflow.studio>';
+/**
+ * Email service — CE no-op stub.
+ *
+ * The production build uses Resend for email verification, password reset,
+ * and collaboration invites. CE ships a stub that reports email as
+ * unconfigured, so the routes that gate on `isEmailConfigured()` return
+ * HTTP 501 instead of crashing.
+ *
+ * If you self-host CE and want real email, replace this file with an
+ * implementation that exports the same four functions. The simplest path
+ * is to install `resend` and copy the production version. See
+ * https://github.com/TerazW/mathflow-ce#email for guidance.
+ */
 
 export function isEmailConfigured(): boolean {
-  return Boolean(RESEND_API_KEY);
+  return false;
 }
 
-async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (!RESEND_API_KEY) {
-    throw new Error('Email is not configured (RESEND_API_KEY missing)');
-  }
-
-  const { Resend } = await import('resend');
-  const resend = new Resend(RESEND_API_KEY);
-
-  await resend.emails.send({
-    from: EMAIL_FROM,
-    to,
-    subject,
-    html,
-  });
+function unavailable(): never {
+  throw new Error(
+    'Email is not configured in this CE build. Provide your own services/email.ts.',
+  );
 }
 
 export async function sendVerificationEmail(
-  email: string,
-  token: string,
-  frontendUrl: string,
-  displayName?: string,
+  _to: string,
+  _token: string,
+  _frontendUrl: string,
+  _displayName?: string | null,
 ): Promise<void> {
-  const verifyUrl = `${frontendUrl}#verify=${token}`;
-  const name = displayName || 'there';
-
-  await sendEmail(
-    email,
-    'Verify your MathFlow account',
-    `<p>Hi ${name},</p>
-     <p>Please verify your email by clicking the link below:</p>
-     <p><a href="${verifyUrl}">${verifyUrl}</a></p>
-     <p>This link expires in 24 hours.</p>`,
-  );
+  unavailable();
 }
 
 export async function sendPasswordResetEmail(
-  email: string,
-  token: string,
-  frontendUrl: string,
-  _displayName?: string,
+  _to: string,
+  _token: string,
+  _frontendUrl: string,
+  _displayName?: string | null,
 ): Promise<void> {
-  const resetUrl = `${frontendUrl}#reset=${token}`;
+  unavailable();
+}
 
-  await sendEmail(
-    email,
-    'Reset your MathFlow password',
-    `<p>You requested a password reset.</p>
-     <p>Click the link below to set a new password:</p>
-     <p><a href="${resetUrl}">${resetUrl}</a></p>
-     <p>This link expires in 1 hour. If you didn't request this, you can ignore this email.</p>`,
-  );
+export async function sendCollaborationInviteEmail(
+  _to: string,
+  _token: string,
+  _inviterName: string,
+  _noteTitle: string,
+  _permission: string,
+  _frontendUrl: string,
+): Promise<void> {
+  unavailable();
 }
