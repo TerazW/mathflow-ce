@@ -113,7 +113,7 @@ function hitTestArc(el: { id: string; center: [number, number]; radius: number; 
   if (d > HIT_THRESHOLD) return null;
   const angle = Math.atan2(my - el.center[1], mx - el.center[0]) * 180 / Math.PI;
   let a = ((angle % 360) + 360) % 360;
-  let start = ((el.startAngle % 360) + 360) % 360;
+  const start = ((el.startAngle % 360) + 360) % 360;
   let end = ((el.endAngle % 360) + 360) % 360;
   if (start > end) end += 360;
   if (a < start) a += 360;
