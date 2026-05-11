@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './lib/auth-context';
 import { loadTheme, applyTheme } from './lib/ai-settings';
 import { AuthPage } from './components/Auth/AuthPage';
@@ -9,7 +9,6 @@ import { SnippetPanel } from './components/SnippetPanel/SnippetPanel';
 import { AISettingsPanel } from './components/Settings/AISettings';
 import { BridgeStatusBadge } from './components/BridgeSetup/BridgeStatusBadge';
 import { BridgeSetup } from './components/BridgeSetup/BridgeSetup';
-import { updateNoteContent } from './lib/storage';
 import { notes as notesApi, notebooks as notebooksApi } from './lib/api';
 import { processSyncQueue, onOnlineStatusChange } from './lib/offline-storage';
 import './styles/app.css';
@@ -17,14 +16,14 @@ import './styles/editor.css';
 import './styles/math.css';
 
 function AppContent() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { isAuthenticated, loading, logout } = useAuth();
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [snippetPanelVisible, setSnippetPanelVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [bridgeSetupVisible, setBridgeSetupVisible] = useState(false);
   const [skippedAuth, setSkippedAuth] = useState(false);
-  const [editorKey, setEditorKey] = useState(0);
+  const [editorKey] = useState(0);
 
   // Process offline sync queue when coming back online
   useEffect(() => {

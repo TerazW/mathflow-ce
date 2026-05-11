@@ -63,7 +63,7 @@ function loadFromLocalOrOffline(editor: any, noteId: string, noteIdRef?: React.R
 }
 
 export function Editor({ noteId, onContentChange }: EditorProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [aiPopup, setAiPopup] = useState<{
     position: { top: number; left: number };

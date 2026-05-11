@@ -147,7 +147,7 @@ export const FigureNode = Node.create({
         renderer.render(data, new Set(), null);
 
         const labels = collectLabels(data);
-        updateLabelOverlays(canvasContainer, labels, (x, y) => coords.toCanvas(x, y));
+        updateLabelOverlays(canvasContainer, labels, (x: number, y: number) => coords.toCanvas(x, y));
       };
 
       renderPreview();
